@@ -73,13 +73,14 @@ node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 Usage: node scripts/index.js [options]
 
 Options:
-  -p, --projects <paths>   本地仓库路径列表（逗号分隔），覆盖 config.json 配置
+  -p, --projects <paths>   本地仓库路径列表（逗号分隔，可选，缺省则使用 config.json 配置）
   -t, --timeframe <type>   时间范围：day|week|month|year (默认：week)
   --since <date>           开始日期 (YYYY-MM-DD)
   --until <date>           结束日期 (YYYY-MM-DD)
   -a, --author <name>      按作者筛选（可选，缺省则使用 git config --global user.name）
-  -o, --output <file>      输出文件路径（可选，缺省则输出到 ./worklog.md）
+  -o, --output <file>      输出文件路径（可选，缺省则输出到标准输出）
   -f, --format <type>      输出格式：markdown|json|text (默认：markdown)
+  --no-progress            禁用进度输出（便于机器解析）
   -h, --help               显示帮助
 ```
 
@@ -190,44 +191,45 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 ## 使用示例
 
 ```bash
-# 日报（精简格式）
+# 日报（输出到标准输出）
 node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 
-# 周报（详细格式）
+# 周报（输出到标准输出）
 node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week
 
-# 月报（详细格式）
-node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe month
+# 月报（输出到文件）
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe month -o monthly-report.md
 
-# 年报（详细格式）
-node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe year
+# 年报（输出到文件）
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe year -o yearly-report.md
 
 # 自定义时间范围
 node ~/.claude/skills/commit-reporter/scripts/index.js --since "2026-03-01" --until "2026-03-10"
 
-# 输出到默认文件 (./worklog.md)
+# 使用 config.json 中的项目配置（默认）
 node ~/.claude/skills/commit-reporter/scripts/index.js
 
-# 输出到指定文件
-node ~/.claude/skills/commit-reporter/scripts/index.js -o ./reports/my-report.md
-
-# 输出到终端
-node ~/.claude/skills/commit-reporter/scripts/index.js -f text -o -
-
-# 指定项目路径
+# 指定项目路径（覆盖 config.json）
 node ~/.claude/skills/commit-reporter/scripts/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
 
 # 按作者筛选
 node ~/.claude/skills/commit-reporter/scripts/index.js -a "hejianghu"
+
+# JSON 格式输出（便于 AI 处理）
+node ~/.claude/skills/commit-reporter/scripts/index.js -f json --no-progress
+
+# 纯文本输出
+node ~/.claude/skills/commit-reporter/scripts/index.js -f text
 ```
 
 ## 输出文件
 
 ### 默认输出
 
-- **文件**: `scripts/worklog.md`（skill 目录的 scripts 子目录）
+- **输出目标**: 标准输出（stdout）
 - **格式**: Markdown
-- **自动创建**: 文件不存在时自动创建
+- **文件输出**: 使用 `-o` 参数指定文件路径
+- **进度信息**: 默认显示，使用 `--no-progress` 禁用
 
 ## 常见问题
 

@@ -137,20 +137,21 @@ Output:
 Usage: node scripts/index.js [options]
 
 Options:
-  -p, --projects <paths>   Local repository paths (comma-separated)
+  -p, --projects <paths>   Local repository paths (comma-separated, optional)
   -t, --timeframe <type>   Timeframe: day|week|month|year (default: week)
   --since <date>           Start date (YYYY-MM-DD)
   --until <date>           End date (YYYY-MM-DD)
-  -a, --author <name>      Filter by author (default: git config user.name)
-  -o, --output <file>      Output file path (default: ./worklog.md)
+  -a, --author <name>      Filter by author (default: git config --global user.name)
+  -o, --output <file>      Output file path (optional, default: stdout)
   -f, --format <type>      Output format: markdown|json|text (default: markdown)
+  --no-progress            Disable progress output (for machine parsing)
   -h, --help               Show help
 ```
 
 ### Examples
 
 ```bash
-# Daily report
+# Daily report (output to stdout by default)
 node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 
 # Weekly report to specific file
@@ -159,11 +160,17 @@ node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week -o ./wee
 # Custom date range
 node ~/.claude/skills/commit-reporter/scripts/index.js --since "2026-03-01" --until "2026-03-10"
 
-# Multiple projects
+# Multiple projects (overrides config.json)
 node ~/.claude/skills/commit-reporter/scripts/index.js -p "/path/to/repo1,/path/to/repo2"
 
-# Output to terminal
-node ~/.claude/skills/commit-reporter/scripts/index.js -f text -o -
+# Use projects from config.json (default)
+node ~/.claude/skills/commit-reporter/scripts/index.js
+
+# JSON output (optimized for LLM parsing)
+node ~/.claude/skills/commit-reporter/scripts/index.js -f json --no-progress
+
+# Output to stdout (default behavior)
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 ```
 
 ## Output Formats
@@ -171,12 +178,22 @@ node ~/.claude/skills/commit-reporter/scripts/index.js -f text -o -
 ### Markdown (default)
 - Daily: simplified single-line format
 - Weekly/Monthly/Yearly: detailed format with categories
+- Human-readable with emoji and formatting
 
-### JSON
-Machine-readable format with full metadata.
+### JSON (LLM-optimized)
+- Flattened commit list for easy parsing
+- Summary statistics by type
+- Metadata for context
+- Ideal for AI agents to process
 
 ### Text
 Plain text format for terminal viewing.
+
+## Output Destination
+
+- **Default**: stdout (standard output)
+- **With `-o`**: Write to specified file
+- **Progress messages**: Only shown when not using `--no-progress`
 
 ## Default Behavior
 

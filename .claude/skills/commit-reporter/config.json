@@ -1,6 +1,6 @@
 {
   "projects": [
-    "/Users/dale/repo/commit-reporter"
+    "/Users/dale/repo/commit-reporter/"
   ],
   "output_dir": "/Users/dale/repo/commit-reporter/reports",
   "default_timeframe": "week"

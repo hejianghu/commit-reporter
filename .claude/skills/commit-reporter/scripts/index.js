@@ -6,7 +6,7 @@
  * Generate daily/weekly/monthly/yearly reports from local Git repositories.
  * 
  * Usage:
- *   node ~/.claude/skills/commit-reporter/index.js --timeframe day
+ *   node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
  */
 
 const { program } = require('commander');
@@ -15,8 +15,8 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
 
-// Load configuration (from same directory as this script)
-const configPath = path.join(__dirname, 'config.json');
+// Load configuration (from parent directory - skill root)
+const configPath = path.join(__dirname, '..', 'config.json');
 let config = {};
 if (fs.existsSync(configPath)) {
   config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
@@ -26,26 +26,22 @@ program
   .name('commit-reporter')
   .description('Generate reports from local Git repository commit logs')
   .version('1.0.0')
-  .option('-p, --projects <paths>', 'local repository paths (comma-separated)')
+  .option('-p, --projects <paths>', 'local repository paths (comma-separated, optional)')
   .option('-t, --timeframe <type>', 'timeframe: day|week|month|year', 'week')
   .option('--since <date>', 'start date (YYYY-MM-DD)')
   .option('--until <date>', 'end date (YYYY-MM-DD)')
   .option('-a, --author <name>', 'filter by author (default: git config --global user.name)')
-  .option('-o, --output <file>', 'output file path (default: ./worklog.md)')
+  .option('-o, --output <file>', 'output file path (optional, default: stdout)')
   .option('-f, --format <type>', 'output format: markdown|json|text', 'markdown')
+  .option('--no-progress', 'disable progress output (for machine parsing)')
   .parse(process.argv);
 
 const options = program.opts();
 
-// Get projects
+// Get projects (from -p parameter or config.json)
 const projects = options.projects 
   ? options.projects.split(',').map(p => p.trim())
   : (config.projects || []);
-
-if (projects.length === 0) {
-  console.error('❌ No projects specified. Use -p or add to config.json');
-  process.exit(1);
-}
 
 // Calculate date range
 function getDateRange(timeframe) {
@@ -94,14 +90,18 @@ function getGitLog(repoPath, since, until, author) {
   
   // Check if path exists
   if (!fs.existsSync(resolvedPath)) {
-    console.error(`⚠️  Path does not exist: ${resolvedPath}`);
+    if (options.progress) {
+      console.error(`⚠️  Path does not exist: ${resolvedPath}`);
+    }
     return [];
   }
   
   // Check if it's a git repository
   const gitDir = path.join(resolvedPath, '.git');
   if (!fs.existsSync(gitDir)) {
-    console.error(`⚠️  Not a git repository: ${resolvedPath}`);
+    if (options.progress) {
+      console.error(`⚠️  Not a git repository: ${resolvedPath}`);
+    }
     return [];
   }
   
@@ -134,7 +134,9 @@ function getGitLog(repoPath, since, until, author) {
     
     return commits;
   } catch (error) {
-    console.error(`⚠️  Error fetching git log from ${resolvedPath}: ${error.message}`);
+    if (options.progress) {
+      console.error(`⚠️  Error fetching git log from ${resolvedPath}: ${error.message}`);
+    }
     return [];
   }
 }
@@ -279,19 +281,49 @@ function generateMarkdownReport(projectCommits, dateRange, timeframe) {
   }
 }
 
-// Generate JSON report
+// Generate JSON report (optimized for LLM parsing)
 function generateJsonReport(projectCommits, dateRange, timeframe) {
+  // Flatten commits for easier LLM processing
+  const allCommits = [];
+  Object.keys(projectCommits).forEach(projectName => {
+    projectCommits[projectName].forEach(commit => {
+      allCommits.push({
+        project: projectName,
+        ...commit
+      });
+    });
+  });
+  
+  // Group by type for summary
+  const grouped = groupCommitsByType(allCommits);
+  
   return JSON.stringify({
     metadata: {
       generated: dayjs().toISOString(),
       timeframe,
       dateRange
     },
-    projects: projectCommits,
     summary: {
       totalProjects: Object.keys(projectCommits).length,
-      totalCommits: Object.values(projectCommits).reduce((sum, commits) => sum + commits.length, 0)
-    }
+      totalCommits: allCommits.length,
+      byType: {
+        features: grouped.feat.length,
+        bugfixes: grouped.fix.length,
+        documentation: grouped.docs.length,
+        refactoring: grouped.refactor.length,
+        tests: grouped.test.length,
+        chores: grouped.chore.length,
+        other: grouped.other.length
+      }
+    },
+    commits: allCommits.map(c => ({
+      project: c.project,
+      hash: c.hash,
+      type: c.message.split(':')[0]?.trim() || 'other',
+      message: c.message,
+      author: c.author,
+      date: dateRange.since
+    }))
   }, null, 2);
 }
 
@@ -320,22 +352,28 @@ function generateTextReport(projectCommits, dateRange, timeframe) {
 
 // Main function
 async function main() {
-  console.log('🔍 Commit Reporter v1.0.0\n');
-  console.log(`📅 Timeframe: ${options.timeframe}`);
-  console.log(`📦 Projects: ${projects.length}`);
-  console.log('');
+  // Only show progress if --no-progress is not set
+  if (options.progress !== false) {
+    console.log('🔍 Commit Reporter v1.0.0\n');
+    console.log(`📅 Timeframe: ${options.timeframe}`);
+    console.log(`📦 Projects: ${projects.length}`);
+    console.log('');
+  }
   
   const dateRange = getDateRange(options.timeframe);
-  console.log(`📆 Date Range: ${dateRange.since} to ${dateRange.until}\n`);
   
-  // Get default author if not specified
-  const author = options.author || getDefaultAuthor();
-  if (author) {
-    console.log(`👤 Author filter: ${author}`);
-  } else {
-    console.log(`👤 Author filter: (all authors)`);
+  if (options.progress !== false) {
+    console.log(`📆 Date Range: ${dateRange.since} to ${dateRange.until}\n`);
+    
+    // Get default author if not specified
+    const author = options.author || getDefaultAuthor();
+    if (author) {
+      console.log(`👤 Author filter: ${author}`);
+    } else {
+      console.log(`👤 Author filter: (all authors)`);
+    }
+    console.log('');
   }
-  console.log('');
   
   // Fetch commits for all projects
   const projectCommits = {};
@@ -344,10 +382,16 @@ async function main() {
     const projectName = getProjectName(project);
     const projectPath = getProjectPath(project);
     
-    console.log(`⏳ Fetching ${projectName}...`);
-    const commits = getGitLog(projectPath, dateRange.since, dateRange.until, author);
+    if (options.progress !== false) {
+      console.log(`⏳ Fetching ${projectName}...`);
+    }
+    
+    const commits = getGitLog(projectPath, dateRange.since, dateRange.until, options.author || getDefaultAuthor());
     projectCommits[projectName] = commits;
-    console.log(`   ✓ ${commits.length} commits\n`);
+    
+    if (options.progress !== false) {
+      console.log(`   ✓ ${commits.length} commits\n`);
+    }
   }
   
   // Generate report
@@ -366,18 +410,16 @@ async function main() {
   }
   
   // Output
-  const outputPath = options.output || path.join(__dirname, 'worklog.md');
-  
-  if (outputPath === '-') {
-    // Output to stdout
-    console.log('\n--- REPORT START ---\n');
-    console.log(report);
-    console.log('\n--- REPORT END ---');
-  } else {
+  if (options.output) {
     // Write to file
-    const resolvedOutput = path.resolve(outputPath);
+    const resolvedOutput = path.resolve(options.output);
     fs.writeFileSync(resolvedOutput, report);
-    console.log(`✅ Report saved to: ${resolvedOutput}`);
+    if (options.progress !== false) {
+      console.log(`✅ Report saved to: ${resolvedOutput}`);
+    }
+  } else {
+    // Output to stdout (default)
+    console.log(report);
   }
 }
 
