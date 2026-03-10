@@ -8,7 +8,8 @@
     "daily": "node index.js --timeframe day",
     "weekly": "node index.js --timeframe week",
     "monthly": "node index.js --timeframe month",
-    "yearly": "node index.js --timeframe year"
+    "yearly": "node index.js --timeframe year",
+    "setup": "node scripts/setup.js"
   },
   "keywords": [
     "git",
@@ -30,12 +31,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "files": [
-    "index.js",
-    ".claude/skills/commit-reporter/"
-  ],
   "skill": {
     "name": "commit-reporter",
-    "entry": ".claude/skills/commit-reporter/SKILL.md"
+    "entry": "SKILL.md"
   }
 }

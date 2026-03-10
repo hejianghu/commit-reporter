@@ -73,11 +73,11 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 > - 符合 skill-creator 模式
 > - 避免自动执行的安全风险
 
-> 💡 **为什么脚本在 skill 目录？**
-> - 直接放在 `~/.claude/skills/commit-reporter/scripts/setup.js`
-> - 不需要复制到用户目录
-> - skill 更新时脚本也会同步更新
-> - 更符合 skill 的组织方式
+> 💡 **所有文件都在 skill 目录**
+> - `index.js`, `package.json`, `config.json` 都在 `~/.claude/skills/commit-reporter/`
+> - 用户直接到这里修改配置
+> - 不需要复制或 symlink
+> - 结构简单清晰
 
 ### 步骤 3: 验证安装
 

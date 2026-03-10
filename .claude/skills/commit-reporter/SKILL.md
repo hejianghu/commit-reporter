@@ -46,7 +46,6 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 This will:
 - Create `~/.commit-reporter/` directory
 - Create default `config.json`
-- Create symlink to `index.js` (or copy if symlink fails)
 
 ### Step 3: Configure
 
@@ -98,7 +97,7 @@ Edit `~/.commit-reporter/config.json`:
 ### Daily Report (Simplified Format)
 
 ```bash
-node ~/.commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/index.js --timeframe day
 ```
 
 Output:
@@ -109,7 +108,7 @@ commit-reporter: feat: add new feature, fix: bug fix, docs: update README
 ### Weekly Report (Detailed Format)
 
 ```bash
-node ~/.commit-reporter/index.js --timeframe week
+node ~/.claude/skills/commit-reporter/index.js --timeframe week
 ```
 
 Output:
@@ -149,19 +148,19 @@ Options:
 
 ```bash
 # Daily report
-node ~/.commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/index.js --timeframe day
 
 # Weekly report to specific file
-node ~/.commit-reporter/index.js --timeframe week -o ./weekly-report.md
+node ~/.claude/skills/commit-reporter/index.js --timeframe week -o ./weekly-report.md
 
 # Custom date range
-node ~/.commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
+node ~/.claude/skills/commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
 
 # Multiple projects
-node ~/.commit-reporter/index.js -p "/path/to/repo1,/path/to/repo2"
+node ~/.claude/skills/commit-reporter/index.js -p "/path/to/repo1,/path/to/repo2"
 
 # Output to terminal
-node ~/.commit-reporter/index.js -f text -o -
+node ~/.claude/skills/commit-reporter/index.js -f text -o -
 ```
 
 ## Output Formats
@@ -178,9 +177,21 @@ Plain text format for terminal viewing.
 
 ## Default Behavior
 
-- **Output**: `./worklog.md` (current directory)
+- **Output**: `./worklog.md` (in skill directory)
 - **Author**: Auto-detect from `git config --global user.name`
 - **Timeframe**: `week` (if not specified)
+
+## File Structure
+
+```
+~/.claude/skills/commit-reporter/
+├── SKILL.md          # Skill documentation
+├── index.js          # Main CLI program
+├── package.json      # Dependencies
+├── config.json       # Configuration (edit this!)
+└── scripts/
+    └── setup.js      # One-time setup script
+```
 
 ## System Requirements
 

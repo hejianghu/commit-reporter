@@ -16,9 +16,8 @@ const os = require('os');
 // Get home directory
 const homeDir = os.homedir();
 const globalConfigDir = path.join(homeDir, '.commit-reporter');
-const skillDir = path.dirname(__dirname); // ~/.claude/skills/commit-reporter/
+const skillDir = __dirname; // ~/.claude/skills/commit-reporter/
 const targetConfigPath = path.join(globalConfigDir, 'config.json');
-const sourceIndexPath = path.join(skillDir, '..', '..', 'index.js');
 
 console.log('🔧 Setting up commit-reporter...\n');
 
@@ -42,24 +41,8 @@ if (!fs.existsSync(targetConfigPath)) {
   console.log(`ℹ️  Config already exists: ${targetConfigPath}`);
 }
 
-// Create symlink or copy index.js to global directory
-const globalIndexPath = path.join(globalConfigDir, 'index.js');
-if (fs.existsSync(sourceIndexPath)) {
-  try {
-    // Try to create symlink first
-    if (!fs.existsSync(globalIndexPath)) {
-      fs.symlinkSync(sourceIndexPath, globalIndexPath);
-      console.log(`✅ Created symlink: ${globalIndexPath} -> ${sourceIndexPath}`);
-    }
-  } catch (error) {
-    // Fallback to copy
-    fs.copyFileSync(sourceIndexPath, globalIndexPath);
-    console.log(`✅ Copied CLI to: ${globalIndexPath}`);
-  }
-}
-
-// Read package.json
-const packagePath = path.join(skillDir, '..', '..', 'package.json');
+// Read package.json from skill directory
+const packagePath = path.join(skillDir, 'package.json');
 if (fs.existsSync(packagePath)) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
   console.log(`\n📦 Version: ${packageJson.version}`);
@@ -70,5 +53,5 @@ console.log('\n✨ Setup complete!\n');
 console.log('📝 Next steps:');
 console.log(`   1. Edit config: ${targetConfigPath}`);
 console.log('   2. Add your project paths to the "projects" array');
-console.log('   3. Run: node ~/.commit-reporter/index.js --timeframe day\n');
+console.log('   3. Run: node ~/.claude/skills/commit-reporter/index.js --timeframe day\n');
 console.log('📖 Documentation: https://github.com/hejianghu/commit-reporter\n');

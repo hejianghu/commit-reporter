@@ -6,10 +6,7 @@
  * Generate daily/weekly/monthly/yearly reports from local Git repositories.
  * 
  * Usage:
- *   node index.js --timeframe day
- *   node index.js --timeframe week
- *   node index.js --timeframe month
- *   node index.js --since "2026-03-01" --until "2026-03-10"
+ *   node ~/.claude/skills/commit-reporter/index.js --timeframe day
  */
 
 const { program } = require('commander');
@@ -18,7 +15,7 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
 
-// Load configuration
+// Load configuration (from same directory as this script)
 const configPath = path.join(__dirname, 'config.json');
 let config = {};
 if (fs.existsSync(configPath)) {
@@ -201,8 +198,8 @@ function generateDailyReport(projectCommits) {
     }
     
     // Format: 项目 A：任务 1，任务 2，任务 3
-    const messages = commits.map(c => c.message).join('，');
-    report += `${projectName}：${messages}`;
+    const messages = commits.map(c => c.message).join(',');
+    report += `${projectName}:${messages}`;
   });
   
   return report || 'No commits in this period';

@@ -22,14 +22,14 @@
 # Install
 npx skills add hejianghu/commit-reporter -g -y
 
-# Setup (one-time, manual)
+# Setup (one-time)
 node ~/.claude/skills/commit-reporter/scripts/setup.js
 ```
 
 安装后会：
-- 创建全局配置目录 `~/.commit-reporter/`（运行 setup 脚本后）
+- 创建全局配置目录 `~/.commit-reporter/`
 - 创建默认配置文件 `~/.commit-reporter/config.json`
-- 创建 symlink 到 skill 中的 `index.js`
+- 所有文件都在 `~/.claude/skills/commit-reporter/` 目录
 
 ### 方式 2: 本地安装使用
 
@@ -64,7 +64,7 @@ npm install
 
 **Cursor Skill 用户**：
 ```bash
-node ~/.commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/index.js --timeframe day
 ```
 
 **本地安装用户**：
@@ -210,41 +210,41 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 
 ```bash
 # 日报（精简格式）
-node ~/.commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/index.js --timeframe day
 
 # 周报（详细格式）
-node ~/.commit-reporter/index.js --timeframe week
+node ~/.claude/skills/commit-reporter/index.js --timeframe week
 
 # 月报（详细格式）
-node ~/.commit-reporter/index.js --timeframe month
+node ~/.claude/skills/commit-reporter/index.js --timeframe month
 
 # 年报（详细格式）
-node ~/.commit-reporter/index.js --timeframe year
+node ~/.claude/skills/commit-reporter/index.js --timeframe year
 
 # 自定义时间范围
-node ~/.commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
+node ~/.claude/skills/commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
 
 # 输出到默认文件 (./worklog.md)
-node ~/.commit-reporter/index.js
+node ~/.claude/skills/commit-reporter/index.js
 
 # 输出到指定文件
-node ~/.commit-reporter/index.js -o ./reports/my-report.md
+node ~/.claude/skills/commit-reporter/index.js -o ./reports/my-report.md
 
 # 输出到终端
-node ~/.commit-reporter/index.js -f text -o -
+node ~/.claude/skills/commit-reporter/index.js -f text -o -
 
 # 指定项目路径
-node ~/.commit-reporter/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
+node ~/.claude/skills/commit-reporter/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
 
 # 按作者筛选
-node ~/.commit-reporter/index.js -a "hejianghu"
+node ~/.claude/skills/commit-reporter/index.js -a "hejianghu"
 ```
 
 ## 输出文件
 
 ### 默认输出
 
-- **文件**: `./worklog.md`（当前目录）
+- **文件**: `./worklog.md`（skill 目录）
 - **格式**: Markdown
 - **自动创建**: 文件不存在时自动创建
 
@@ -279,8 +279,9 @@ git config --global user.email "your@email.com"
 ### Q: 如何在 Cursor 中使用？
 
 1. 安装 skill: `npx skills add hejianghu/commit-reporter -g -y`
-2. 在 Cursor 对话中直接说："生成我的项目日报"
-3. 或手动运行：`node ~/.commit-reporter/index.js --timeframe day`
+2. 运行 setup: `node ~/.claude/skills/commit-reporter/scripts/setup.js`
+3. 配置项目：编辑 `~/.commit-reporter/config.json`
+4. 在 Cursor 对话中直接说："生成我的项目日报"
 
 ## 系统要求
 
