@@ -1,7 +1,7 @@
 {
   "name": "commit-reporter",
   "version": "1.0.0",
-  "description": "Generate daily/weekly/monthly/yearly reports from GitHub commit logs",
+  "description": "Generate daily/weekly/monthly/yearly reports from local Git repository commit logs",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,24 +9,36 @@
     "weekly": "node index.js --timeframe week",
     "monthly": "node index.js --timeframe month",
     "yearly": "node index.js --timeframe year",
-    "test": "node test.js"
+    "postinstall": "node .claude/skills/commit-reporter/post-install.js"
   },
   "keywords": [
-    "github",
+    "git",
     "commit",
     "report",
     "automation",
     "daily-report",
-    "weekly-report"
+    "weekly-report",
+    "worklog",
+    "skill",
+    "cursor"
   ],
   "author": "hejianghu",
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
-    "dayjs": "^1.11.19",
-    "node-fetch": "^3.3.0"
+    "dayjs": "^1.11.19"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "config.json",
+    ".claude/skills/commit-reporter/"
+  ],
+  "skill": {
+    "name": "commit-reporter",
+    "entry": ".claude/skills/commit-reporter/SKILL.md",
+    "postInstall": ".claude/skills/commit-reporter/post-install.js"
   }
 }

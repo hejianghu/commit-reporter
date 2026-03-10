@@ -12,20 +12,39 @@
 - 📝 **日报精简模式**: 日报采用单行摘要格式，周报/月报/年报采用详细格式
 - 💻 **跨平台支持**: 支持 Windows 和 macOS 绝对路径配置
 - 🔒 **无需 GitHub Token**: 仅读取本地 Git 仓库，无需联网
+- 🤖 **Cursor Skill**: 支持通过 `npx skills add` 安装到 Cursor
 
-## 快速开始
+## 安装方式
 
-### 安装依赖
+### 方式 1: 作为 Cursor Skill 安装（推荐）
 
 ```bash
+npx skills add hejianghu/commit-reporter -g -y
+```
+
+安装后会自动：
+- 创建全局配置目录 `~/.commit-reporter/`
+- 创建默认配置文件 `~/.commit-reporter/config.json`
+- 安装 CLI 工具到 `~/.commit-reporter/index.js`
+
+### 方式 2: 本地安装使用
+
+```bash
+# Clone 仓库
+git clone https://github.com/hejianghu/commit-reporter.git
+cd commit-reporter
+
+# 安装依赖
 npm install
 ```
 
-### 配置项目列表
+## 快速开始
 
-编辑 `config.json` 添加要追踪的本地仓库路径：
+### 1. 配置项目列表
 
-#### 方式 1: 简单数组格式
+**Cursor Skill 用户**：编辑 `~/.commit-reporter/config.json`
+
+**本地安装用户**：编辑 `./config.json`
 
 ```json
 {
@@ -33,81 +52,34 @@ npm install
     "/Users/dale/repo/commit-reporter",
     "/Users/dale/repo/my-project"
   ],
-  "output_dir": "/Users/dale/repo/commit-reporter/reports",
   "default_timeframe": "week"
 }
 ```
 
-#### 方式 2: 对象数组格式（支持自定义项目名称）
+### 2. 生成报告
 
-```json
-{
-  "projects": [
-    {"name": "Commit Reporter", "path": "/Users/dale/repo/commit-reporter"},
-    {"name": "我的项目", "path": "/Users/dale/repo/my-project"}
-  ],
-  "output_dir": "/Users/dale/repo/commit-reporter/reports",
-  "default_timeframe": "week"
-}
-```
-
-### 跨平台路径配置说明
-
-**macOS 用户**:
-```json
-{
-  "projects": [
-    "/Users/dale/repo/commit-reporter",
-    "/Users/dale/repo/my-project"
-  ]
-}
-```
-
-**Windows 用户**:
-```json
-{
-  "projects": [
-    "C:\\Users\\dale\\repo\\commit-reporter",
-    "D:\\projects\\my-project"
-  ]
-}
-```
-
-> 💡 **提示**: 
-> - 使用绝对路径，避免相对路径受工作目录影响
-> - Windows 路径使用双反斜杠 `\\` 或正斜杠 `/`
-> - macOS/Linux 路径使用正斜杠 `/`
-> - 支持相对路径（相对于 config.json 所在目录）
-
-### 生成报告
-
+**Cursor Skill 用户**：
 ```bash
-# 日报（精简格式）
+node ~/.commit-reporter/index.js --timeframe day
+```
+
+**本地安装用户**：
+```bash
 node index.js --timeframe day
+```
 
-# 周报（详细格式）
-node index.js --timeframe week
+### 3. 在 Cursor 中使用
 
-# 月报（详细格式）
-node index.js --timeframe month
+安装 skill 后，直接在 Cursor 对话中说：
 
-# 年报（详细格式）
-node index.js --timeframe year
+```
+生成我的项目日报
+```
 
-# 自定义时间范围
-node index.js --since "2026-03-01" --until "2026-03-10"
+或
 
-# 输出到默认文件 (./worklog.md)
-node index.js
-
-# 输出到指定文件
-node index.js -o ./reports/my-report.md
-
-# 输出到终端
-node index.js -f text
-
-# 指定项目路径
-node index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
+```
+查看本周的 commit 活动
 ```
 
 ## 命令行选项
@@ -131,8 +103,8 @@ Options:
 ### 日报（精简格式）
 
 ```
-项目 A：feat: 新增登录功能，fix: 修复样式问题，docs: 更新 README
-项目 B：refactor: 优化数据库查询，test: 添加单元测试
+commit-reporter：feat: 新增登录功能，fix: 修复样式问题，docs: 更新 README
+my-project：refactor: 优化数据库查询，test: 添加单元测试
 ```
 
 ### 周报/月报/年报（详细格式）
@@ -140,26 +112,26 @@ Options:
 ```markdown
 # Commit Report
 
-**Period**: 2026-03-03 to 2026-03-10 (week)
+**Period**: 2026-03-04 to 2026-03-11 (week)
 **Generated**: 2026-03-11 01:20:00
 
 ---
 
-## 📦 Commit Reporter
+## 📦 commit-reporter
 
 **Total Commits**: 5
 
 ### 🚀 Features
 
-- `8783273` feat: add OpenSpec structure *(@dale, 03-11)*
+- `8783273` feat: add OpenSpec structure *(@hejianghu)*
 
 ### 🐛 Bug Fixes
 
-- `5976259` fix: initial commit *(@dale, 03-10)*
+- `5976259` fix: initial commit *(@hejianghu)*
 
 ### 👥 Contributors (1)
 
-- dale
+- hejianghu
 
 ---
 
@@ -169,7 +141,7 @@ Options:
 **Total Commits**: 10
 ```
 
-## 配置文件详解
+## 配置详解
 
 ### config.json 完整示例
 
@@ -209,50 +181,68 @@ Options:
 ```
 报告中使用 `name` 字段显示，更友好。
 
+### 跨平台路径配置
+
+**macOS 用户**:
+```json
+{
+  "projects": ["/Users/dale/repo/commit-reporter"]
+}
+```
+
+**Windows 用户**:
+```json
+{
+  "projects": ["C:\\Users\\dale\\repo\\commit-reporter"]
+}
+```
+
+> 💡 **提示**: 
+> - 使用绝对路径，避免相对路径受工作目录影响
+> - Windows 路径使用双反斜杠 `\\` 或正斜杠 `/`
+> - macOS/Linux 路径使用正斜杠 `/`
+
+## 使用示例
+
+```bash
+# 日报（精简格式）
+node ~/.commit-reporter/index.js --timeframe day
+
+# 周报（详细格式）
+node ~/.commit-reporter/index.js --timeframe week
+
+# 月报（详细格式）
+node ~/.commit-reporter/index.js --timeframe month
+
+# 年报（详细格式）
+node ~/.commit-reporter/index.js --timeframe year
+
+# 自定义时间范围
+node ~/.commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
+
+# 输出到默认文件 (./worklog.md)
+node ~/.commit-reporter/index.js
+
+# 输出到指定文件
+node ~/.commit-reporter/index.js -o ./reports/my-report.md
+
+# 输出到终端
+node ~/.commit-reporter/index.js -f text -o -
+
+# 指定项目路径
+node ~/.commit-reporter/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
+
+# 按作者筛选
+node ~/.commit-reporter/index.js -a "hejianghu"
+```
+
 ## 输出文件
 
 ### 默认输出
 
-- **文件**: `./worklog.md`（项目根目录）
+- **文件**: `./worklog.md`（当前目录）
 - **格式**: Markdown
 - **自动创建**: 文件不存在时自动创建
-
-### .gitignore 配置
-
-`worklog.md` 已纳入 `.gitignore`，不会被提交：
-
-```gitignore
-# 依赖
-node_modules/
-npm-debug.log*
-
-# 日志
-logs/
-*.log
-
-# 报告输出
-worklog.md
-reports/
-*.report.md
-
-# 配置文件（敏感）
-config.local.json
-*.secret.json
-
-# macOS
-.DS_Store
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# 临时文件
-tmp/
-temp/
-*.tmp
-```
 
 ## 常见问题
 
@@ -282,12 +272,37 @@ git config --global user.email "your@email.com"
 
 建议使用英文路径，避免潜在的编码问题。如必须使用中文路径，请确保系统编码正确。
 
+### Q: 如何在 Cursor 中使用？
+
+1. 安装 skill: `npx skills add hejianghu/commit-reporter -g -y`
+2. 在 Cursor 对话中直接说："生成我的项目日报"
+3. 或手动运行：`node ~/.commit-reporter/index.js --timeframe day`
+
 ## 系统要求
 
 - **Node.js**: >= 18.0.0
 - **Git**: >= 2.0.0（系统已安装 git 命令行工具）
 - **操作系统**: macOS / Windows / Linux
 
+## 开发
+
+```bash
+# Clone 仓库
+git clone https://github.com/hejianghu/commit-reporter.git
+cd commit-reporter
+
+# 安装依赖
+npm install
+
+# 运行测试
+npm run daily    # 生成日报
+npm run weekly   # 生成周报
+```
+
 ## 许可证
 
 MIT
+
+## 仓库
+
+https://github.com/hejianghu/commit-reporter
