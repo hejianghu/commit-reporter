@@ -222,6 +222,10 @@ Plain text format for terminal viewing.
 
 MIT
 
+## Documentation
+
+See `README.md` in this directory for complete documentation.
+
 ## Repository
 
 https://github.com/hejianghu/commit-reporter

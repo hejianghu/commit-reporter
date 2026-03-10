@@ -16,7 +16,7 @@
 
 ## 安装方式
 
-### 方式 1: 作为 Cursor Skill 安装（推荐）
+### 作为 Cursor Skill 安装（推荐）
 
 ```bash
 # Install
@@ -265,13 +265,7 @@ git config --global user.email "your@email.com"
 4. 在 Cursor 对话中直接说："生成我的项目日报"
 5. 或手动运行：`node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day`
 
-## 系统要求
-
-- **Node.js**: >= 18.0.0
-- **Git**: >= 2.0.0（系统已安装 git 命令行工具）
-- **操作系统**: macOS / Windows / Linux
-
-## 开发
+### Q: 如何开发这个 skill？
 
 ```bash
 # Clone 仓库
@@ -285,6 +279,14 @@ npm install
 npm run daily    # 生成日报
 npm run weekly   # 生成周报
 ```
+
+## 系统要求
+
+- **Node.js**: >= 18.0.0
+- **Git**: >= 2.0.0（系统已安装 git 命令行工具）
+- **操作系统**: macOS / Windows / Linux
+
+
 
 ## 许可证
 
