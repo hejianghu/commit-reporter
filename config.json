@@ -1,0 +1,8 @@
+{
+  "projects": [
+    "hejianghu/commit-reporter"
+  ],
+  "output_dir": "./reports",
+  "default_timeframe": "week",
+  "github_token": ""
+}

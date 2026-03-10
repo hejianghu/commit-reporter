@@ -1,0 +1,29 @@
+# 依赖
+node_modules/
+npm-debug.log*
+
+# 日志
+logs/
+*.log
+
+# 报告输出
+reports/
+*.report.md
+
+# 配置文件（敏感）
+config.local.json
+*.secret.json
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+tmp/
+temp/
+*.tmp

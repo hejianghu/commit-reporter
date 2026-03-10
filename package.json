@@ -1,0 +1,33 @@
+{
+  "name": "commit-reporter",
+  "version": "1.0.0",
+  "description": "Generate daily/weekly/monthly/yearly reports from GitHub commit logs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "daily": "node index.js --timeframe day",
+    "weekly": "node index.js --timeframe week",
+    "monthly": "node index.js --timeframe month",
+    "yearly": "node index.js --timeframe year",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "github",
+    "commit",
+    "report",
+    "automation",
+    "daily-report",
+    "weekly-report"
+  ],
+  "author": "hejianghu",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "node-fetch": "^3.3.0",
+    "dayjs": "^1.11.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
