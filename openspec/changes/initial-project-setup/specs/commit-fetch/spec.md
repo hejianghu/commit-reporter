@@ -1,8 +1,5 @@
-# commit-fetch Specification
+## ADDED Requirements
 
-## Purpose
-TBD - created by archiving change initial-project-setup. Update Purpose after archive.
-## Requirements
 ### Requirement: 从本地 Git 仓库获取 Commit 数据
 系统 SHALL 支持使用 `git log` 命令从本地 Git 仓库获取 commit 历史记录。
 
@@ -36,4 +33,3 @@ TBD - created by archiving change initial-project-setup. Update Purpose after ar
 #### Scenario: 部分仓库获取失败
 - **WHEN** 某个路径不是 Git 仓库
 - **THEN** 系统记录错误并继续处理其他仓库
-

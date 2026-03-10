@@ -18,50 +18,31 @@ TBD - created by archiving change initial-project-setup. Update Purpose after ar
 - **WHEN** config.json 格式无效（非 JSON）
 - **THEN** 系统显示错误信息并使用空配置
 
-### Requirement: 支持跨平台绝对路径配置
-系统 SHALL 支持在 config.json 中配置 Windows 和 macOS 不同格式的绝对路径。
+### Requirement: 支持跨平台本地路径配置
+系统 SHALL 支持在 config.json 中配置 Windows 和 macOS 不同格式的本地绝对路径。
 
 #### Scenario: macOS 路径格式
-- **WHEN** config.json 中 output_dir 为 `/Users/dale/repo/commit-reporter/reports`
-- **THEN** 系统正确解析并使用该路径
+- **WHEN** config.json 中项目路径为 `/Users/dale/repo/commit-reporter`
+- **THEN** 系统正确解析并访问该本地仓库
 
 #### Scenario: Windows 路径格式
-- **WHEN** config.json 中 output_dir 为 `C:\\Users\\dale\\repo\\commit-reporter\\reports`
-- **THEN** 系统正确解析并使用该路径
+- **WHEN** config.json 中项目路径为 `C:\\Users\\dale\\repo\\commit-reporter`
+- **THEN** 系统正确解析并访问该本地仓库
 
-#### Scenario: 路径配置说明
-- **WHEN** 用户查看 config.json 示例
-- **THEN** 提供 Windows 和 macOS 两种格式的示例注释
-
-### Requirement: 支持 GitHub Token 配置
-系统 SHALL 支持通过配置文件或环境变量提供 GitHub API Token。
-
-#### Scenario: 从 config.json 读取 Token
-- **WHEN** config.json 中包含 github_token 字段
-- **THEN** 系统使用该 Token 进行 API 认证
-
-#### Scenario: 从环境变量读取 Token
-- **WHEN** 设置 GITHUB_TOKEN 环境变量
-- **THEN** 系统使用该 Token 进行 API 认证
-
-#### Scenario: 命令行参数覆盖
-- **WHEN** 用户提供 --token 参数
-- **THEN** 该 Token 覆盖配置文件和环境变量中的设置
+#### Scenario: 相对路径支持
+- **WHEN** config.json 中使用相对路径 `../my-project`
+- **THEN** 系统相对于 config.json 所在目录解析路径
 
 ### Requirement: 项目列表支持双格式配置
 系统 SHALL 支持 projects 字段的两种配置格式：简单数组和对象数组。
 
 #### Scenario: 简单数组格式
-- **WHEN** config.json 中 projects 为 `["owner/repo1", "owner/repo2"]`
-- **THEN** 系统使用仓库全名作为显示名称
+- **WHEN** config.json 中 projects 为 `["/Users/dale/repo/project1", "/Users/dale/repo/project2"]`
+- **THEN** 系统使用路径最后一级作为项目名称
 
 #### Scenario: 对象数组格式
-- **WHEN** config.json 中 projects 为 `[{"name": "项目 A", "path": "owner/repo1"}]`
+- **WHEN** config.json 中 projects 为 `[{"name": "项目 A", "path": "/Users/dale/repo/project1"}]`
 - **THEN** 系统使用 name 字段作为报告中的显示名称
-
-#### Scenario: 混合格式兼容性
-- **WHEN** config.json 中同时存在两种格式
-- **THEN** 系统自动检测并兼容处理
 
 #### Scenario: 命令行参数覆盖项目列表
 - **WHEN** 用户提供 --projects 参数
