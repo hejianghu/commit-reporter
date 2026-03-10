@@ -3,7 +3,7 @@
 /**
  * Commit Reporter - Setup Script
  * 
- * Run this script once after installing to set up the global configuration.
+ * Run this script once after installing to verify the installation.
  * 
  * Usage:
  *   node ~/.claude/skills/commit-reporter/scripts/setup.js
@@ -11,47 +11,36 @@
 
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
-// Get home directory
-const homeDir = os.homedir();
-const globalConfigDir = path.join(homeDir, '.commit-reporter');
-const skillDir = __dirname; // ~/.claude/skills/commit-reporter/
-const targetConfigPath = path.join(globalConfigDir, 'config.json');
+const skillDir = path.join(__dirname, '..'); // ~/.claude/skills/commit-reporter/
+const configPath = path.join(skillDir, 'config.json');
 
-console.log('🔧 Setting up commit-reporter...\n');
+console.log('🔧 Verifying commit-reporter installation...\n');
 
-// Create global config directory
-if (!fs.existsSync(globalConfigDir)) {
-  fs.mkdirSync(globalConfigDir, { recursive: true });
-  console.log(`✅ Created config directory: ${globalConfigDir}`);
-}
-
-// Create default config if not exists
-if (!fs.existsSync(targetConfigPath)) {
-  const defaultConfig = {
-    projects: [],
-    output_dir: path.join(globalConfigDir, 'reports'),
-    default_timeframe: 'week'
-  };
+// Check if config.json exists
+if (fs.existsSync(configPath)) {
+  console.log(`✅ Config file found: ${configPath}`);
   
-  fs.writeFileSync(targetConfigPath, JSON.stringify(defaultConfig, null, 2));
-  console.log(`✅ Created default config: ${targetConfigPath}`);
+  // Read and display current config
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  console.log(`\n📋 Current configuration:`);
+  console.log(`   Projects: ${config.projects?.length || 0} configured`);
+  console.log(`   Default timeframe: ${config.default_timeframe || 'week'}`);
 } else {
-  console.log(`ℹ️  Config already exists: ${targetConfigPath}`);
+  console.log(`❌ Config file not found: ${configPath}`);
+  console.log(`\n⚠️  Please make sure config.json exists in the skill directory`);
 }
 
-// Read package.json from parent directory (skill root)
-const packagePath = path.join(skillDir, '..', 'package.json');
+// Read package.json
+const packagePath = path.join(skillDir, 'package.json');
 if (fs.existsSync(packagePath)) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
   console.log(`\n📦 Version: ${packageJson.version}`);
-  console.log(`📦 Dependencies: ${Object.keys(packageJson.dependencies || {}).join(', ')}`);
 }
 
 console.log('\n✨ Setup complete!\n');
 console.log('📝 Next steps:');
-console.log(`   1. Edit config: ${targetConfigPath}`);
+console.log(`   1. Edit config: ${configPath}`);
 console.log('   2. Add your project paths to the "projects" array');
-console.log('   3. Run: node ~/.claude/skills/commit-reporter/index.js --timeframe day\n');
+console.log('   3. Run: node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day\n');
 console.log('📖 Documentation: https://github.com/hejianghu/commit-reporter\n');

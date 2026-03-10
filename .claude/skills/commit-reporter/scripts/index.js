@@ -15,7 +15,7 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
 
-// Load configuration (from parent directory - skill root)
+// Load configuration (from skill root directory)
 const configPath = path.join(__dirname, '..', 'config.json');
 let config = {};
 if (fs.existsSync(configPath)) {

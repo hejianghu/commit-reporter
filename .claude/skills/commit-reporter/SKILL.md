@@ -40,19 +40,20 @@ node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 npx skills add hejianghu/commit-reporter -g -y
 ```
 
-### Step 2: Run Setup (One-time)
+### Step 2: Run Setup (Verification)
 
 ```bash
 node ~/.claude/skills/commit-reporter/scripts/setup.js
 ```
 
 This will:
-- Create `~/.commit-reporter/` directory
-- Create default `config.json`
+- Verify installation
+- Check config.json exists
+- Display current configuration
 
 ### Step 3: Configure
 
-Edit `~/.commit-reporter/config.json`:
+Edit `~/.claude/skills/commit-reporter/config.json`:
 
 ```json
 {
@@ -206,12 +207,13 @@ Plain text format for terminal viewing.
 ```
 ~/.claude/skills/commit-reporter/
 ├── SKILL.md          # Skill documentation
+├── README.md         # Complete documentation
 ├── package.json      # Dependencies
-├── config.json       # Configuration (edit this!)
+├── config.json       # Configuration (edit this file!)
 ├── .gitignore
 └── scripts/
     ├── index.js      # Main CLI program
-    └── setup.js      # One-time setup script
+    └── setup.js      # Verification script
 ```
 
 ## System Requirements

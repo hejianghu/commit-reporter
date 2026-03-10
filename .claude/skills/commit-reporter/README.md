@@ -35,7 +35,7 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 
 ### 1. 配置项目列表
 
-编辑 `~/.commit-reporter/config.json`：
+编辑 `~/.claude/skills/commit-reporter/config.json`：
 
 ```json
 {
@@ -230,6 +230,12 @@ node ~/.claude/skills/commit-reporter/scripts/index.js -f text
 - **格式**: Markdown
 - **文件输出**: 使用 `-o` 参数指定文件路径
 - **进度信息**: 默认显示，使用 `--no-progress` 禁用
+
+### 配置文件
+
+- **位置**: `~/.claude/skills/commit-reporter/config.json`
+- **作用**: 配置默认追踪的项目路径
+- **编辑**: 直接编辑此文件添加你的项目
 
 ## 常见问题
 
