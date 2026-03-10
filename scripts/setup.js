@@ -1,20 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * Commit Reporter - Post Install Script
- * Sets up the global configuration and symlinks
+ * Commit Reporter - Setup Script
+ * 
+ * Run this script after installing to set up the global configuration.
+ * 
+ * Usage:
+ *   node scripts/setup.js
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 const os = require('os');
 
 // Get home directory
 const homeDir = os.homedir();
 const globalConfigDir = path.join(homeDir, '.commit-reporter');
-const skillDir = __dirname;
+const skillDir = path.dirname(__dirname);
 const targetConfigPath = path.join(globalConfigDir, 'config.json');
+const targetIndexPath = path.join(globalConfigDir, 'index.js');
+const sourceIndexPath = path.join(skillDir, 'index.js');
 
 console.log('🔧 Setting up commit-reporter...\n');
 
@@ -39,19 +44,17 @@ if (!fs.existsSync(targetConfigPath)) {
 }
 
 // Copy index.js to global directory
-const globalIndexPath = path.join(globalConfigDir, 'index.js');
-const sourceIndexPath = path.join(skillDir, 'index.js');
-
 if (fs.existsSync(sourceIndexPath)) {
-  fs.copyFileSync(sourceIndexPath, globalIndexPath);
-  console.log(`✅ Installed CLI to: ${globalIndexPath}`);
+  fs.copyFileSync(sourceIndexPath, targetIndexPath);
+  console.log(`✅ Installed CLI to: ${targetIndexPath}`);
 }
 
-// Copy package.json to read dependencies
-const sourcePackagePath = path.join(skillDir, '..', 'package.json');
-if (fs.existsSync(sourcePackagePath)) {
-  const packageJson = JSON.parse(fs.readFileSync(sourcePackagePath, 'utf-8'));
-  console.log(`\n📦 Dependencies: ${Object.keys(packageJson.dependencies || {}).join(', ')}`);
+// Read package.json
+const packagePath = path.join(skillDir, 'package.json');
+if (fs.existsSync(packagePath)) {
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+  console.log(`\n📦 Version: ${packageJson.version}`);
+  console.log(`📦 Dependencies: ${Object.keys(packageJson.dependencies || {}).join(', ')}`);
 }
 
 console.log('\n✨ Setup complete!\n');

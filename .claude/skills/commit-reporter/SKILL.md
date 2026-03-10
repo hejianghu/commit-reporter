@@ -13,6 +13,9 @@ Generate structured reports from local Git repository commit logs.
 # Install globally
 npx skills add hejianghu/commit-reporter -g -y
 
+# Run setup script (manual, safer than auto post-install)
+node ~/.commit-reporter/scripts/setup.js
+
 # Usage in Cursor
 # Just ask: "Generate a daily report for my projects"
 ```
@@ -26,9 +29,28 @@ npx skills add hejianghu/commit-reporter -g -y
 - 💻 Support multiple projects tracking
 - 🔒 No GitHub API or token required (local git log only)
 
-## Configuration
+## Installation & Configuration
 
-Create `~/.commit-reporter/config.json`:
+### Step 1: Install
+
+```bash
+npx skills add hejianghu/commit-reporter -g -y
+```
+
+### Step 2: Run Setup (Manual)
+
+```bash
+node ~/.commit-reporter/scripts/setup.js
+```
+
+This will:
+- Create `~/.commit-reporter/` directory
+- Create default `config.json`
+- Copy `index.js` to global location
+
+### Step 3: Configure
+
+Edit `~/.commit-reporter/config.json`:
 
 ```json
 {

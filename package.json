@@ -9,7 +9,7 @@
     "weekly": "node index.js --timeframe week",
     "monthly": "node index.js --timeframe month",
     "yearly": "node index.js --timeframe year",
-    "postinstall": "node .claude/skills/commit-reporter/post-install.js"
+    "setup": "node scripts/setup.js"
   },
   "keywords": [
     "git",
@@ -33,12 +33,11 @@
   },
   "files": [
     "index.js",
-    "config.json",
+    "scripts/",
     ".claude/skills/commit-reporter/"
   ],
   "skill": {
     "name": "commit-reporter",
-    "entry": ".claude/skills/commit-reporter/SKILL.md",
-    "postInstall": ".claude/skills/commit-reporter/post-install.js"
+    "entry": ".claude/skills/commit-reporter/SKILL.md"
   }
 }

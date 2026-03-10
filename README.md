@@ -19,11 +19,15 @@
 ### 方式 1: 作为 Cursor Skill 安装（推荐）
 
 ```bash
+# Install
 npx skills add hejianghu/commit-reporter -g -y
+
+# Setup (manual, more transparent)
+node ~/.commit-reporter/scripts/setup.js
 ```
 
-安装后会自动：
-- 创建全局配置目录 `~/.commit-reporter/`
+安装后会：
+- 创建全局配置目录 `~/.commit-reporter/`（运行 setup 脚本后）
 - 创建默认配置文件 `~/.commit-reporter/config.json`
 - 安装 CLI 工具到 `~/.commit-reporter/index.js`
 
