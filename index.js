@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Commit Reporter - GitHub Commit Log Report Generator
+ * Commit Reporter - Git Commit Log Report Generator
+ * 
+ * Generate daily/weekly/monthly/yearly reports from local Git repositories.
  * 
  * Usage:
  *   node index.js --timeframe day
@@ -11,7 +13,7 @@
  */
 
 const { program } = require('commander');
-const fetch = require('node-fetch');
+const { execSync } = require('child_process');
 const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
@@ -25,27 +27,23 @@ if (fs.existsSync(configPath)) {
 
 program
   .name('commit-reporter')
-  .description('Generate reports from GitHub commit logs')
+  .description('Generate reports from local Git repository commit logs')
   .version('1.0.0')
-  .option('-p, --projects <list>', 'projects to track (comma-separated)')
+  .option('-p, --projects <paths>', 'local repository paths (comma-separated)')
   .option('-t, --timeframe <type>', 'timeframe: day|week|month|year', 'week')
   .option('--since <date>', 'start date (YYYY-MM-DD)')
   .option('--until <date>', 'end date (YYYY-MM-DD)')
-  .option('-a, --author <name>', 'filter by author')
-  .option('-o, --output <file>', 'output file path')
+  .option('-a, --author <name>', 'filter by author (default: git config --global user.name)')
+  .option('-o, --output <file>', 'output file path (default: ./worklog.md)')
   .option('-f, --format <type>', 'output format: markdown|json|text', 'markdown')
-  .option('--token <token>', 'GitHub token (overrides config)')
   .parse(process.argv);
 
 const options = program.opts();
 
-// Get GitHub token
-const githubToken = options.token || config.github_token || process.env.GITHUB_TOKEN;
-
 // Get projects
 const projects = options.projects 
   ? options.projects.split(',').map(p => p.trim())
-  : config.projects || [];
+  : (config.projects || []);
 
 if (projects.length === 0) {
   console.error('❌ No projects specified. Use -p or add to config.json');
@@ -80,40 +78,66 @@ function getDateRange(timeframe) {
   };
 }
 
-// Fetch commits from GitHub API
-async function fetchCommits(repo, since, until, author) {
-  const [owner, repoName] = repo.split('/');
-  let url = `https://api.github.com/repos/${owner}/${repoName}/commits?since=${since}T00:00:00Z&until=${until}T23:59:59Z&per_page=100`;
+// Get default author from git config
+function getDefaultAuthor() {
+  try {
+    const author = execSync('git config --global user.name', { 
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim();
+    return author || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Get commits from local Git repository
+function getGitLog(repoPath, since, until, author) {
+  const resolvedPath = path.resolve(repoPath);
   
-  if (author) {
-    url += `&author=${author}`;
+  // Check if path exists
+  if (!fs.existsSync(resolvedPath)) {
+    console.error(`⚠️  Path does not exist: ${resolvedPath}`);
+    return [];
   }
   
-  const headers = {
-    'Accept': 'application/vnd.github.v3+json'
-  };
+  // Check if it's a git repository
+  const gitDir = path.join(resolvedPath, '.git');
+  if (!fs.existsSync(gitDir)) {
+    console.error(`⚠️  Not a git repository: ${resolvedPath}`);
+    return [];
+  }
   
-  if (githubToken) {
-    headers['Authorization'] = `token ${githubToken}`;
+  // Build git log command
+  let cmd = `git -C "${resolvedPath}" log --since="${since}" --until="${until}T23:59:59" --format="%H|%an|%ae|%s" --no-merges`;
+  
+  if (author) {
+    cmd += ` --author="${author}"`;
   }
   
   try {
-    const response = await fetch(url, { headers });
+    const output = execSync(cmd, { 
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
     
-    if (response.status === 403) {
-      console.error(`⚠️  Rate limit exceeded for ${repo}`);
+    if (!output.trim()) {
       return [];
     }
     
-    if (!response.ok) {
-      console.error(`❌ Failed to fetch ${repo}: ${response.status} ${response.statusText}`);
-      return [];
-    }
+    const commits = output.trim().split('\n').map(line => {
+      const [hash, authorName, authorEmail, message] = line.split('|');
+      return {
+        hash: hash.substring(0, 7),
+        author: authorName,
+        email: authorEmail,
+        message: message.trim()
+      };
+    });
     
-    const commits = await response.json();
     return commits;
   } catch (error) {
-    console.error(`❌ Error fetching ${repo}: ${error.message}`);
+    console.error(`⚠️  Error fetching git log from ${resolvedPath}: ${error.message}`);
     return [];
   }
 }
@@ -132,7 +156,7 @@ function groupCommitsByType(commits) {
   };
   
   commits.forEach(commit => {
-    const message = commit.commit.message.toLowerCase();
+    const message = commit.message.toLowerCase();
     const type = message.split(':')[0].trim();
     
     if (groups[type]) {
@@ -145,8 +169,47 @@ function groupCommitsByType(commits) {
   return groups;
 }
 
-// Generate Markdown report
-function generateMarkdownReport(projectCommits, dateRange, timeframe) {
+// Get project name from path or config
+function getProjectName(project) {
+  if (typeof project === 'object' && project.name) {
+    return project.name;
+  }
+  
+  // Extract from path
+  const projectPath = typeof project === 'object' ? project.path : project;
+  return path.basename(projectPath);
+}
+
+// Get project path
+function getProjectPath(project) {
+  return typeof project === 'object' ? project.path : project;
+}
+
+// Generate simplified daily report
+function generateDailyReport(projectCommits) {
+  let report = '';
+  
+  Object.keys(projectCommits).forEach((projectName, index) => {
+    const commits = projectCommits[projectName];
+    
+    if (commits.length === 0) {
+      return;
+    }
+    
+    if (index > 0) {
+      report += '\n';
+    }
+    
+    // Format: 项目 A：任务 1，任务 2，任务 3
+    const messages = commits.map(c => c.message).join('，');
+    report += `${projectName}：${messages}`;
+  });
+  
+  return report || 'No commits in this period';
+}
+
+// Generate detailed report (weekly/monthly/yearly)
+function generateDetailedReport(projectCommits, dateRange, timeframe) {
   const { since, until } = dateRange;
   
   let report = `# Commit Report\n\n`;
@@ -156,11 +219,11 @@ function generateMarkdownReport(projectCommits, dateRange, timeframe) {
   
   let totalCommits = 0;
   
-  Object.keys(projectCommits).forEach(repo => {
-    const commits = projectCommits[repo];
+  Object.keys(projectCommits).forEach(projectName => {
+    const commits = projectCommits[projectName];
     totalCommits += commits.length;
     
-    report += `## 📦 ${repo}\n\n`;
+    report += `## 📦 ${projectName}\n\n`;
     
     if (commits.length === 0) {
       report += `*No commits in this period*\n\n`;
@@ -188,19 +251,14 @@ function generateMarkdownReport(projectCommits, dateRange, timeframe) {
       if (grouped[type].length > 0) {
         report += `### ${typeLabels[type]}\n\n`;
         grouped[type].forEach(commit => {
-          const message = commit.commit.message.split('\n')[0];
-          const author = commit.commit.author.name;
-          const date = dayjs(commit.commit.author.date).format('MM-DD');
-          const sha = commit.sha.substring(0, 7);
-          
-          report += `- \`${sha}\` ${message} *(@${author}, ${date})*\n`;
+          report += `- \`${commit.hash}\` ${commit.message} *(@${commit.author})*\n`;
         });
         report += `\n`;
       }
     });
     
     // Contributors
-    const contributors = [...new Set(commits.map(c => c.commit.author.name))];
+    const contributors = [...new Set(commits.map(c => c.author))];
     report += `### 👥 Contributors (${contributors.length})\n\n`;
     report += contributors.map(c => `- ${c}`).join('\n') + '\n\n';
     
@@ -213,6 +271,15 @@ function generateMarkdownReport(projectCommits, dateRange, timeframe) {
   report += `**Total Commits**: ${totalCommits}\n`;
   
   return report;
+}
+
+// Generate Markdown report
+function generateMarkdownReport(projectCommits, dateRange, timeframe) {
+  if (timeframe === 'day') {
+    return generateDailyReport(projectCommits);
+  } else {
+    return generateDetailedReport(projectCommits, dateRange, timeframe);
+  }
 }
 
 // Generate JSON report
@@ -240,16 +307,13 @@ function generateTextReport(projectCommits, dateRange, timeframe) {
   report += `Generated: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}\n`;
   report += '='.repeat(60) + '\n\n';
   
-  Object.keys(projectCommits).forEach(repo => {
-    const commits = projectCommits[repo];
-    report += `${repo} (${commits.length} commits)\n`;
+  Object.keys(projectCommits).forEach(projectName => {
+    const commits = projectCommits[projectName];
+    report += `${projectName} (${commits.length} commits)\n`;
     report += '-'.repeat(40) + '\n';
     
     commits.forEach(commit => {
-      const message = commit.commit.message.split('\n')[0];
-      const author = commit.commit.author.name;
-      const sha = commit.sha.substring(0, 7);
-      report += `  [${sha}] ${message} - ${author}\n`;
+      report += `  [${commit.hash}] ${commit.message} - ${commit.author}\n`;
     });
     report += '\n';
   });
@@ -261,19 +325,31 @@ function generateTextReport(projectCommits, dateRange, timeframe) {
 async function main() {
   console.log('🔍 Commit Reporter v1.0.0\n');
   console.log(`📅 Timeframe: ${options.timeframe}`);
-  console.log(`📦 Projects: ${projects.join(', ')}`);
+  console.log(`📦 Projects: ${projects.length}`);
   console.log('');
   
   const dateRange = getDateRange(options.timeframe);
   console.log(`📆 Date Range: ${dateRange.since} to ${dateRange.until}\n`);
   
+  // Get default author if not specified
+  const author = options.author || getDefaultAuthor();
+  if (author) {
+    console.log(`👤 Author filter: ${author}`);
+  } else {
+    console.log(`👤 Author filter: (all authors)`);
+  }
+  console.log('');
+  
   // Fetch commits for all projects
   const projectCommits = {};
   
-  for (const repo of projects) {
-    console.log(`⏳ Fetching ${repo}...`);
-    const commits = await fetchCommits(repo, dateRange.since, dateRange.until, options.author);
-    projectCommits[repo] = commits;
+  for (const project of projects) {
+    const projectName = getProjectName(project);
+    const projectPath = getProjectPath(project);
+    
+    console.log(`⏳ Fetching ${projectName}...`);
+    const commits = getGitLog(projectPath, dateRange.since, dateRange.until, author);
+    projectCommits[projectName] = commits;
     console.log(`   ✓ ${commits.length} commits\n`);
   }
   
@@ -293,14 +369,18 @@ async function main() {
   }
   
   // Output
-  if (options.output) {
-    const outputPath = path.resolve(options.output);
-    fs.writeFileSync(outputPath, report);
-    console.log(`✅ Report saved to: ${outputPath}`);
-  } else {
-    console.log('--- REPORT START ---\n');
+  const outputPath = options.output || path.join(__dirname, 'worklog.md');
+  
+  if (outputPath === '-') {
+    // Output to stdout
+    console.log('\n--- REPORT START ---\n');
     console.log(report);
-    console.log('--- REPORT END ---');
+    console.log('\n--- REPORT END ---');
+  } else {
+    // Write to file
+    const resolvedOutput = path.resolve(outputPath);
+    fs.writeFileSync(resolvedOutput, report);
+    console.log(`✅ Report saved to: ${resolvedOutput}`);
   }
 }
 

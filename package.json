@@ -22,11 +22,10 @@
   "author": "hejianghu",
   "license": "MIT",
   "dependencies": {
-    "commander": "^12.0.0",
-    "node-fetch": "^3.3.0",
-    "dayjs": "^1.11.0"
+    "commander": "^12.1.0",
+    "dayjs": "^1.11.19",
+    "node-fetch": "^3.3.0"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }

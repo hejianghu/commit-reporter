@@ -1,8 +1,7 @@
 {
   "projects": [
-    "hejianghu/commit-reporter"
+    "/Users/dale/repo/commit-reporter"
   ],
-  "output_dir": "./reports",
-  "default_timeframe": "week",
-  "github_token": ""
+  "output_dir": "/Users/dale/repo/commit-reporter/reports",
+  "default_timeframe": "week"
 }
