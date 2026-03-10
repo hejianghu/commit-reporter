@@ -41,8 +41,8 @@ if (!fs.existsSync(targetConfigPath)) {
   console.log(`ℹ️  Config already exists: ${targetConfigPath}`);
 }
 
-// Read package.json from skill directory
-const packagePath = path.join(skillDir, 'package.json');
+// Read package.json from parent directory (skill root)
+const packagePath = path.join(skillDir, '..', 'package.json');
 if (fs.existsSync(packagePath)) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
   console.log(`\n📦 Version: ${packageJson.version}`);

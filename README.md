@@ -31,24 +31,11 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 - 创建默认配置文件 `~/.commit-reporter/config.json`
 - 所有文件都在 `~/.claude/skills/commit-reporter/` 目录
 
-### 方式 2: 本地安装使用
-
-```bash
-# Clone 仓库
-git clone https://github.com/hejianghu/commit-reporter.git
-cd commit-reporter
-
-# 安装依赖
-npm install
-```
-
 ## 快速开始
 
 ### 1. 配置项目列表
 
-**Cursor Skill 用户**：编辑 `~/.commit-reporter/config.json`
-
-**本地安装用户**：编辑 `./config.json`
+编辑 `~/.commit-reporter/config.json`：
 
 ```json
 {
@@ -62,14 +49,8 @@ npm install
 
 ### 2. 生成报告
 
-**Cursor Skill 用户**：
 ```bash
-node ~/.claude/skills/commit-reporter/index.js --timeframe day
-```
-
-**本地安装用户**：
-```bash
-node index.js --timeframe day
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 ```
 
 ### 3. 在 Cursor 中使用
@@ -89,7 +70,7 @@ node index.js --timeframe day
 ## 命令行选项
 
 ```
-Usage: node index.js [options]
+Usage: node scripts/index.js [options]
 
 Options:
   -p, --projects <paths>   本地仓库路径列表（逗号分隔），覆盖 config.json 配置
@@ -210,41 +191,41 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 
 ```bash
 # 日报（精简格式）
-node ~/.claude/skills/commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 
 # 周报（详细格式）
-node ~/.claude/skills/commit-reporter/index.js --timeframe week
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week
 
 # 月报（详细格式）
-node ~/.claude/skills/commit-reporter/index.js --timeframe month
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe month
 
 # 年报（详细格式）
-node ~/.claude/skills/commit-reporter/index.js --timeframe year
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe year
 
 # 自定义时间范围
-node ~/.claude/skills/commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
+node ~/.claude/skills/commit-reporter/scripts/index.js --since "2026-03-01" --until "2026-03-10"
 
 # 输出到默认文件 (./worklog.md)
-node ~/.claude/skills/commit-reporter/index.js
+node ~/.claude/skills/commit-reporter/scripts/index.js
 
 # 输出到指定文件
-node ~/.claude/skills/commit-reporter/index.js -o ./reports/my-report.md
+node ~/.claude/skills/commit-reporter/scripts/index.js -o ./reports/my-report.md
 
 # 输出到终端
-node ~/.claude/skills/commit-reporter/index.js -f text -o -
+node ~/.claude/skills/commit-reporter/scripts/index.js -f text -o -
 
 # 指定项目路径
-node ~/.claude/skills/commit-reporter/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
+node ~/.claude/skills/commit-reporter/scripts/index.js -p "/Users/dale/repo/commit-reporter,/Users/dale/repo/my-project"
 
 # 按作者筛选
-node ~/.claude/skills/commit-reporter/index.js -a "hejianghu"
+node ~/.claude/skills/commit-reporter/scripts/index.js -a "hejianghu"
 ```
 
 ## 输出文件
 
 ### 默认输出
 
-- **文件**: `./worklog.md`（skill 目录）
+- **文件**: `scripts/worklog.md`（skill 目录的 scripts 子目录）
 - **格式**: Markdown
 - **自动创建**: 文件不存在时自动创建
 
@@ -282,6 +263,7 @@ git config --global user.email "your@email.com"
 2. 运行 setup: `node ~/.claude/skills/commit-reporter/scripts/setup.js`
 3. 配置项目：编辑 `~/.commit-reporter/config.json`
 4. 在 Cursor 对话中直接说："生成我的项目日报"
+5. 或手动运行：`node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day`
 
 ## 系统要求
 
@@ -294,7 +276,7 @@ git config --global user.email "your@email.com"
 ```bash
 # Clone 仓库
 git clone https://github.com/hejianghu/commit-reporter.git
-cd commit-reporter
+cd commit-reporter/.claude/skills/commit-reporter
 
 # 安装依赖
 npm install

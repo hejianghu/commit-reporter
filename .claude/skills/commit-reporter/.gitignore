@@ -1,17 +1,17 @@
-# 依赖
+# Dependencies
 node_modules/
-npm-debug.log*
 
-# 日志
+# Logs
 logs/
 *.log
+npm-debug.log*
 
-# 报告输出
+# Report output
 worklog.md
 reports/
 *.report.md
 
-# 配置文件（敏感）
+# Config (sensitive)
 config.local.json
 *.secret.json
 
@@ -24,7 +24,7 @@ config.local.json
 *.swp
 *.swo
 
-# 临时文件
+# Temp files
 tmp/
 temp/
 *.tmp

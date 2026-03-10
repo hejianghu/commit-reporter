@@ -18,6 +18,9 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 
 # Usage in Cursor
 # Just ask: "Generate a daily report for my projects"
+
+# Or run directly
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 ```
 
 ## What It Does
@@ -97,7 +100,7 @@ Edit `~/.commit-reporter/config.json`:
 ### Daily Report (Simplified Format)
 
 ```bash
-node ~/.claude/skills/commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 ```
 
 Output:
@@ -108,7 +111,7 @@ commit-reporter: feat: add new feature, fix: bug fix, docs: update README
 ### Weekly Report (Detailed Format)
 
 ```bash
-node ~/.claude/skills/commit-reporter/index.js --timeframe week
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week
 ```
 
 Output:
@@ -131,7 +134,7 @@ Output:
 ### Command Line Options
 
 ```
-Usage: node index.js [options]
+Usage: node scripts/index.js [options]
 
 Options:
   -p, --projects <paths>   Local repository paths (comma-separated)
@@ -148,19 +151,19 @@ Options:
 
 ```bash
 # Daily report
-node ~/.claude/skills/commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 
 # Weekly report to specific file
-node ~/.claude/skills/commit-reporter/index.js --timeframe week -o ./weekly-report.md
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week -o ./weekly-report.md
 
 # Custom date range
-node ~/.claude/skills/commit-reporter/index.js --since "2026-03-01" --until "2026-03-10"
+node ~/.claude/skills/commit-reporter/scripts/index.js --since "2026-03-01" --until "2026-03-10"
 
 # Multiple projects
-node ~/.claude/skills/commit-reporter/index.js -p "/path/to/repo1,/path/to/repo2"
+node ~/.claude/skills/commit-reporter/scripts/index.js -p "/path/to/repo1,/path/to/repo2"
 
 # Output to terminal
-node ~/.claude/skills/commit-reporter/index.js -f text -o -
+node ~/.claude/skills/commit-reporter/scripts/index.js -f text -o -
 ```
 
 ## Output Formats
@@ -186,10 +189,11 @@ Plain text format for terminal viewing.
 ```
 ~/.claude/skills/commit-reporter/
 ├── SKILL.md          # Skill documentation
-├── index.js          # Main CLI program
 ├── package.json      # Dependencies
 ├── config.json       # Configuration (edit this!)
+├── .gitignore
 └── scripts/
+    ├── index.js      # Main CLI program
     └── setup.js      # One-time setup script
 ```
 

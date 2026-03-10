@@ -74,7 +74,7 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 > - 避免自动执行的安全风险
 
 > 💡 **所有文件都在 skill 目录**
-> - `index.js`, `package.json`, `config.json` 都在 `~/.claude/skills/commit-reporter/`
+> - `scripts/index.js`, `package.json`, `config.json` 都在 `~/.claude/skills/commit-reporter/`
 > - 用户直接到这里修改配置
 > - 不需要复制或 symlink
 > - 结构简单清晰
@@ -110,13 +110,13 @@ ls -la ~/.commit-reporter/
 
 ```bash
 # 生成日报
-node ~/.commit-reporter/index.js --timeframe day
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 
 # 生成周报
-node ~/.commit-reporter/index.js --timeframe week
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe week
 
 # 查看输出
-cat ~/.commit-reporter/worklog.md
+cat ~/.claude/skills/commit-reporter/scripts/worklog.md
 ```
 
 ### 步骤 6: 在 Cursor 中使用
@@ -179,13 +179,13 @@ ls -la ~/.claude/skills/
 ls -la /your/project/path/.git
 
 # 检查时间范围
-node ~/.commit-reporter/index.js --timeframe month
+node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe month
 
 # 检查作者
 git config --global user.name
 
 # 不筛选作者运行
-node ~/.commit-reporter/index.js -a ""
+node ~/.claude/skills/commit-reporter/scripts/index.js -a ""
 ```
 
 ## 验证清单
