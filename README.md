@@ -22,14 +22,14 @@
 # Install
 npx skills add hejianghu/commit-reporter -g -y
 
-# Setup (manual, more transparent)
-node ~/.commit-reporter/scripts/setup.js
+# Setup (one-time, manual)
+node ~/.claude/skills/commit-reporter/scripts/setup.js
 ```
 
 安装后会：
 - 创建全局配置目录 `~/.commit-reporter/`（运行 setup 脚本后）
 - 创建默认配置文件 `~/.commit-reporter/config.json`
-- 安装 CLI 工具到 `~/.commit-reporter/index.js`
+- 创建 symlink 到 skill 中的 `index.js`
 
 ### 方式 2: 本地安装使用
 

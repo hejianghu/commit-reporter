@@ -3,10 +3,10 @@
 /**
  * Commit Reporter - Setup Script
  * 
- * Run this script after installing to set up the global configuration.
+ * Run this script once after installing to set up the global configuration.
  * 
  * Usage:
- *   node scripts/setup.js
+ *   node ~/.claude/skills/commit-reporter/scripts/setup.js
  */
 
 const fs = require('fs');
@@ -16,10 +16,9 @@ const os = require('os');
 // Get home directory
 const homeDir = os.homedir();
 const globalConfigDir = path.join(homeDir, '.commit-reporter');
-const skillDir = path.dirname(__dirname);
+const skillDir = path.dirname(__dirname); // ~/.claude/skills/commit-reporter/
 const targetConfigPath = path.join(globalConfigDir, 'config.json');
-const targetIndexPath = path.join(globalConfigDir, 'index.js');
-const sourceIndexPath = path.join(skillDir, 'index.js');
+const sourceIndexPath = path.join(skillDir, '..', '..', 'index.js');
 
 console.log('🔧 Setting up commit-reporter...\n');
 
@@ -43,14 +42,24 @@ if (!fs.existsSync(targetConfigPath)) {
   console.log(`ℹ️  Config already exists: ${targetConfigPath}`);
 }
 
-// Copy index.js to global directory
+// Create symlink or copy index.js to global directory
+const globalIndexPath = path.join(globalConfigDir, 'index.js');
 if (fs.existsSync(sourceIndexPath)) {
-  fs.copyFileSync(sourceIndexPath, targetIndexPath);
-  console.log(`✅ Installed CLI to: ${targetIndexPath}`);
+  try {
+    // Try to create symlink first
+    if (!fs.existsSync(globalIndexPath)) {
+      fs.symlinkSync(sourceIndexPath, globalIndexPath);
+      console.log(`✅ Created symlink: ${globalIndexPath} -> ${sourceIndexPath}`);
+    }
+  } catch (error) {
+    // Fallback to copy
+    fs.copyFileSync(sourceIndexPath, globalIndexPath);
+    console.log(`✅ Copied CLI to: ${globalIndexPath}`);
+  }
 }
 
 // Read package.json
-const packagePath = path.join(skillDir, 'package.json');
+const packagePath = path.join(skillDir, '..', '..', 'package.json');
 if (fs.existsSync(packagePath)) {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
   console.log(`\n📦 Version: ${packageJson.version}`);

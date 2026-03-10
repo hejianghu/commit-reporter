@@ -64,7 +64,7 @@ npx skills add hejianghu/commit-reporter -g -y
 ### 步骤 2.5: 运行 Setup 脚本（手动）
 
 ```bash
-node ~/.commit-reporter/scripts/setup.js
+node ~/.claude/skills/commit-reporter/scripts/setup.js
 ```
 
 > 💡 **为什么是手动执行？** 
@@ -72,6 +72,12 @@ node ~/.commit-reporter/scripts/setup.js
 > - 更透明：知道发生了什么
 > - 符合 skill-creator 模式
 > - 避免自动执行的安全风险
+
+> 💡 **为什么脚本在 skill 目录？**
+> - 直接放在 `~/.claude/skills/commit-reporter/scripts/setup.js`
+> - 不需要复制到用户目录
+> - skill 更新时脚本也会同步更新
+> - 更符合 skill 的组织方式
 
 ### 步骤 3: 验证安装
 
