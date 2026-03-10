@@ -61,6 +61,18 @@ npx skills remove hejianghu/commit-reporter -g
 npx skills add hejianghu/commit-reporter -g -y
 ```
 
+### 步骤 2.5: 运行 Setup 脚本（手动）
+
+```bash
+node ~/.commit-reporter/scripts/setup.js
+```
+
+> 💡 **为什么是手动执行？** 
+> - 更安全：用户可以审查脚本内容
+> - 更透明：知道发生了什么
+> - 符合 skill-creator 模式
+> - 避免自动执行的安全风险
+
 ### 步骤 3: 验证安装
 
 检查以下文件是否存在：
