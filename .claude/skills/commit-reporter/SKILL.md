@@ -51,33 +51,55 @@ This will:
 - Check config.json exists
 - Display current configuration
 
-### Step 3: Configure
+### Step 3: Configure (Two Ways)
+
+**Option A: AI-Assisted Setup (Recommended)**
+
+Just tell your AI assistant:
+
+```
+帮我配置 commit-reporter，我要监控以下项目：
+- 项目名称：my-project
+  项目路径：/Users/dale/repo/my-project
+- 项目名称：another-project
+  项目路径：/Users/dale/repo/another-project
+```
+
+The AI will automatically update `config.json` for you!
+
+**Option B: Manual Edit**
 
 Edit `~/.claude/skills/commit-reporter/config.json`:
 
 ```json
 {
   "projects": [
-    "/Users/dale/repo/commit-reporter",
-    "/Users/dale/repo/my-project"
+    {
+      "name": "my-project",
+      "path": "/Users/dale/repo/my-project"
+    },
+    {
+      "name": "another-project",
+      "path": "/Users/dale/repo/another-project"
+    }
   ],
   "default_timeframe": "week"
 }
 ```
 
-### projects Field - Dual Format Support
+### projects Field Format
 
-**Simple Array**:
-```json
-"projects": ["/Users/dale/repo/project1", "/Users/dale/repo/project2"]
-```
-
-**Object Array** (with custom names):
+**Recommended: Object Array** (with custom names):
 ```json
 "projects": [
   {"name": "Project A", "path": "/Users/dale/repo/project1"},
   {"name": "Project B", "path": "/Users/dale/repo/project2"}
 ]
+```
+
+**Simple Array** (uses folder name as project name):
+```json
+"projects": ["/Users/dale/repo/project1", "/Users/dale/repo/project2"]
 ```
 
 ### Cross-Platform Path Examples
@@ -198,9 +220,18 @@ Plain text format for terminal viewing.
 
 ## Default Behavior
 
-- **Output**: `./worklog.md` (in skill directory)
+- **Output**: stdout (standard output)
 - **Author**: Auto-detect from `git config --global user.name`
 - **Timeframe**: `week` (if not specified)
+- **Projects Priority**: `-p parameter` > `config.json` > `current directory`
+
+### Projects Selection Logic
+
+1. **Command line `-p`** (highest priority) - explicitly specified projects
+2. **config.json** (default) - projects configured in `~/.claude/skills/commit-reporter/config.json`
+3. **Current directory** (fallback) - uses `process.cwd()` if no config found
+
+**Note**: If you have configured `config.json`, the AI will use those projects by default without needing to specify them each time.
 
 ## File Structure
 

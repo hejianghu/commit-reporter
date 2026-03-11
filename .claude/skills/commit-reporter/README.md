@@ -33,15 +33,37 @@ node ~/.claude/skills/commit-reporter/scripts/setup.js
 
 ## 快速开始
 
-### 1. 配置项目列表
+### 1. 配置项目列表（两种方式）
+
+**方式 A：AI 辅助配置（推荐）**
+
+告诉你的 AI 助手：
+
+```
+帮我配置 commit-reporter，我要监控以下项目：
+- 项目名称：my-project
+  项目路径：/Users/dale/repo/my-project
+- 项目名称：another-project
+  项目路径：/Users/dale/repo/another-project
+```
+
+AI 会自动帮你更新 `config.json`！
+
+**方式 B：手动编辑**
 
 编辑 `~/.claude/skills/commit-reporter/config.json`：
 
 ```json
 {
   "projects": [
-    "/Users/dale/repo/commit-reporter",
-    "/Users/dale/repo/my-project"
+    {
+      "name": "my-project",
+      "path": "/Users/dale/repo/my-project"
+    },
+    {
+      "name": "another-project",
+      "path": "/Users/dale/repo/another-project"
+    }
   ],
   "default_timeframe": "week"
 }
@@ -66,6 +88,8 @@ node ~/.claude/skills/commit-reporter/scripts/index.js --timeframe day
 ```
 查看本周的 commit 活动
 ```
+
+> 💡 **提示**：AI 会优先使用 `config.json` 中配置的项目。如果未配置，则使用当前工作目录。
 
 ## 命令行选项
 
@@ -134,8 +158,14 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 ```json
 {
   "projects": [
-    "/Users/dale/repo/commit-reporter",
-    "/Users/dale/repo/my-project"
+    {
+      "name": "commit-reporter",
+      "path": "/Users/dale/repo/commit-reporter"
+    },
+    {
+      "name": "my-project",
+      "path": "/Users/dale/repo/my-project"
+    }
   ],
   "output_dir": "/Users/dale/repo/commit-reporter/reports",
   "default_timeframe": "week"
@@ -150,15 +180,9 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 | `output_dir` | string | ❌ | 输出目录（绝对路径，支持 Windows/Mac） |
 | `default_timeframe` | string | ❌ | 默认时间范围：day/week/month/year |
 
-### projects 字段双格式支持
+### projects 字段格式
 
-**简单数组**（适合快速配置）:
-```json
-"projects": ["/Users/dale/repo/project1", "/Users/dale/repo/project2"]
-```
-报告中直接使用路径最后一级作为项目名称。
-
-**对象数组**（适合自定义名称）:
+**推荐：对象数组**（适合自定义名称）:
 ```json
 "projects": [
   {"name": "项目 A", "path": "/Users/dale/repo/project1"},
@@ -166,6 +190,24 @@ my-project：refactor: 优化数据库查询，test: 添加单元测试
 ]
 ```
 报告中使用 `name` 字段显示，更友好。
+
+**简单数组**（快速配置）:
+```json
+"projects": ["/Users/dale/repo/project1", "/Users/dale/repo/project2"]
+```
+报告中直接使用路径最后一级作为项目名称。
+
+### 项目选择优先级
+
+```
+-p 参数 > config.json > 当前工作目录
+```
+
+1. **命令行 `-p` 参数**（最高优先级）- 显式指定的项目路径
+2. **config.json**（默认）- 配置文件中定义的项目列表
+3. **当前工作目录**（降级方案）- 如果以上都没有，使用 `process.cwd()`
+
+> 💡 **提示**：配置好 `config.json` 后，日常使用无需每次指定项目路径，AI 会自动读取配置。
 
 ### 跨平台路径配置
 

@@ -14,12 +14,19 @@ const { execSync } = require('child_process');
 const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-// Load configuration (from skill root directory)
-const configPath = path.join(__dirname, '..', 'config.json');
+// Load configuration (priority: global config > skill config)
+const globalConfigPath = path.join(os.homedir(), '.commit-reporter', 'config.json');
+const skillConfigPath = path.join(__dirname, '..', 'config.json');
 let config = {};
-if (fs.existsSync(configPath)) {
-  config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+
+if (fs.existsSync(globalConfigPath)) {
+  // Use global config if exists
+  config = JSON.parse(fs.readFileSync(globalConfigPath, 'utf-8'));
+} else if (fs.existsSync(skillConfigPath)) {
+  // Fallback to skill config (for development/testing)
+  config = JSON.parse(fs.readFileSync(skillConfigPath, 'utf-8'));
 }
 
 program
@@ -38,10 +45,18 @@ program
 
 const options = program.opts();
 
-// Get projects (from -p parameter or config.json)
-const projects = options.projects 
-  ? options.projects.split(',').map(p => p.trim())
-  : (config.projects || []);
+// Get projects with priority: -p parameter > config.json > current directory
+let projects;
+if (options.projects) {
+  // Command line parameter has highest priority
+  projects = options.projects.split(',').map(p => p.trim());
+} else if (config.projects && config.projects.length > 0) {
+  // config.json is second priority (most common case)
+  projects = config.projects;
+} else {
+  // Fallback to current working directory
+  projects = [process.cwd()];
+}
 
 // Calculate date range
 function getDateRange(timeframe) {

@@ -1,6 +1,9 @@
 {
   "projects": [
-    "/Users/dale/repo/commit-reporter/"
+    {
+      "name": "commit-reporter",
+      "path": "/Users/dale/repo/commit-reporter"
+    }
   ],
   "default_timeframe": "week"
 }
